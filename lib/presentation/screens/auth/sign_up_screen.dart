@@ -1,10 +1,20 @@
-import 'package:autism/core/utilies/sizes/sized_config.dart';
-import 'package:autism/features/auth/sign_in/views/widgets/sign_in_customTextFields.dart';
-import 'package:autism/features/auth/sign_in/views/widgets/sign_in_screen_body.dart';
+import 'package:autism/logic/services/sized_config.dart';
+import 'package:autism/logic/services/supabase_services.dart';
+import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
+import 'package:autism/logic/services/variables_app.dart';
+import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 
-class SignUpScreenBody extends StatelessWidget {
-  const SignUpScreenBody({super.key});
+class SignUpScreen extends StatefulWidget {
+  SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +34,8 @@ class SignUpScreenBody extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Image.asset(
                       'assets/images/autism-high-resolution-logo.png',
-                      height: 200,
-                      width: 200,
+                      height: 175,
+                      width: 175,
                     ),
                   ),
                   Text(
@@ -38,21 +48,35 @@ class SignUpScreenBody extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 15),
-                  CustomTextFormField(
-                    hintText: 'Enter Your Email',
-                    icon: Icons.email,
-                  ),
-                  const SizedBox(height: 15),
-                  CustomTextFormField(
-                    hintText: 'Enter Your Password',
-                    icon: Icons.lock,
-                    isPassword: true,
-                  ),
-                  const SizedBox(height: 15),
-                  CustomTextFormField(
-                    hintText: 'Confirm Password',
-                    icon: Icons.lock,
-                    isPassword: true,
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        CustomTextFormField(
+                          validator: emailValidator,
+                          controller: emailController,
+                          hintText: 'Enter Your Email',
+                          icon: Icons.email,
+                        ),
+                        const SizedBox(height: 15),
+                        CustomTextFormField(
+                          validator: passwordValidator,
+                          controller: passController,
+                          hintText: 'Enter Your Password',
+                          icon: Icons.lock,
+                          isPassword: true,
+                        ),
+                        const SizedBox(height: 15),
+                        CustomTextFormField(
+                          validator: (value) =>
+                              confirmPasswordValidator(value, passController),
+                          controller: confirmPassController,
+                          hintText: 'Confirm Password',
+                          icon: Icons.lock,
+                          isPassword: true,
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 10),
                   Row(
@@ -80,19 +104,28 @@ class SignUpScreenBody extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 15),
-                  Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFF7F3E),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      if (_formKey.currentState!.validate()) {
+                        SupabaseServices().signUp(context);
+                      } else {
+                        print("Form invalid");
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFF7F3E),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -177,12 +210,18 @@ class SignUpScreenBody extends StatelessWidget {
                         style: TextStyle(color: Colors.black),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignInScreenBody(),
-                          ),
-                        ),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignInScreen(),
+                            ),
+                          );
+                          emailController.clear();
+                          passController.clear();
+                          confirmPassController.clear();
+                        },
+
                         child: Text(
                           " Sign In",
                           style: TextStyle(color: Color(0xFFFF7F3E)),
@@ -197,5 +236,6 @@ class SignUpScreenBody extends StatelessWidget {
         ),
       ),
     );
+    ;
   }
 }

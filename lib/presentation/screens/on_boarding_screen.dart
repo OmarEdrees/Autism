@@ -1,7 +1,7 @@
-import 'package:autism/core/utilies/sizes/sized_config.dart';
-import 'package:autism/features/auth/sign_in/views/widgets/sign_in_screen_body.dart';
-import 'package:autism/features/on_boarding/cubit/on_boarding_cubit.dart';
-import 'package:autism/features/on_boarding/models/on_boarding_steps_list.dart';
+import 'package:autism/logic/services/sized_config.dart';
+import 'package:autism/logic/services/variables_app.dart';
+import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
+import 'package:autism/logic/cubit/on_bording/on_boarding_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,7 +34,7 @@ class OnBoardingScreen extends StatelessWidget {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignInScreenBody(),
+                                builder: (context) => SignInScreen(),
                               ),
                             );
                           },
@@ -72,7 +72,7 @@ class OnBoardingScreen extends StatelessWidget {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignInScreenBody(),
+                                builder: (context) => SignInScreen(),
                               ),
                             );
                           } else {

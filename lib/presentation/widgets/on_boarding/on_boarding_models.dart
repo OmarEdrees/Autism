@@ -1,6 +1,6 @@
-import 'package:autism/core/utilies/sizes/sized_config.dart';
-import 'package:autism/features/on_boarding/models/on_boarding_steps_list.dart';
-import 'package:autism/features/on_boarding/views/screens/on_boarding_screen.dart';
+import 'package:autism/logic/services/sized_config.dart';
+import 'package:autism/logic/services/variables_app.dart';
+import 'package:autism/presentation/screens/on_boarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

@@ -1,11 +1,13 @@
-import 'package:autism/core/utilies/sizes/sized_config.dart';
-import 'package:autism/features/auth/sign_in/views/widgets/sign_in_SocialButton.dart';
-import 'package:autism/features/auth/sign_in/views/widgets/sign_in_customTextFields.dart';
-import 'package:autism/features/auth/sign_up/views/widgets/sign_up_screen_body.dart';
+import 'package:autism/logic/services/sized_config.dart';
+import 'package:autism/presentation/widgets/auth/sign_up_in_SocialButton.dart';
+import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
+import 'package:autism/logic/services/supabase_services.dart';
+import 'package:autism/logic/services/variables_app.dart';
+import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 
-class SignInScreenBody extends StatelessWidget {
-  const SignInScreenBody({super.key});
+class SignInScreen extends StatelessWidget {
+  const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +42,15 @@ class SignInScreenBody extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   CustomTextFormField(
+                    validator: emailValidator,
+                    controller: emailController,
                     hintText: 'Enter Your Email',
                     icon: Icons.email,
                   ),
                   const SizedBox(height: 20),
                   CustomTextFormField(
+                    validator: passwordValidator,
+                    controller: passController,
                     hintText: 'Enter Your Password',
                     icon: Icons.lock,
                     isPassword: true,
@@ -67,19 +73,25 @@ class SignInScreenBody extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 15),
-                  Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFF7F3E),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () {
+                      SupabaseServices().signIn(context);
+                      print('0000000000000000000000000000000000000000');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFF7F3E),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Sign In',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -127,12 +139,16 @@ class SignInScreenBody extends StatelessWidget {
                         style: TextStyle(color: Colors.black),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignUpScreenBody(),
-                          ),
-                        ),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignUpScreen(),
+                            ),
+                          );
+                          emailController.clear();
+                          passController.clear();
+                        },
                         child: Text(
                           " Sign Up",
                           style: TextStyle(color: Color(0xFFFF7F3E)),
