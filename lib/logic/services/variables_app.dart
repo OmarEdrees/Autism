@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
 import 'package:autism/presentation/widgets/on_boarding/on_boarding_models.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 //////////////////////////////////////////////////////////////
 ///////            List of onboarding steps            ///////
@@ -31,6 +35,11 @@ List<OnBoardingScreenWidget> steps = [
 final TextEditingController emailController = TextEditingController();
 final TextEditingController passController = TextEditingController();
 final TextEditingController confirmPassController = TextEditingController();
+final TextEditingController addChildName = TextEditingController();
+final TextEditingController addChildAge = TextEditingController();
+final TextEditingController editeProfileName = TextEditingController();
+final TextEditingController editProfileEmail = TextEditingController();
+final TextEditingController editProfileTagName = TextEditingController();
 
 //////////////////////////////////////////////////////////////
 //////////////         validator            //////////////////
@@ -77,3 +86,46 @@ String? confirmPasswordValidator(
   }
   return null;
 }
+
+////////////////////////////////////////////////////////////
+
+String? addChildNameValidator(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Please enter the name';
+  }
+  if (value.length < 3) {
+    return 'Name must be at least 3 characters long';
+  }
+  return null;
+}
+
+/////////////////////////////////////////////////////////////
+
+String? addChildAgeValidator(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Please enter the age';
+  }
+
+  final age = int.tryParse(value);
+  if (age == null) {
+    return 'Please enter a valid number';
+  }
+
+  if (age < 3) {
+    return 'Age must be 3 years or older';
+  }
+
+  if (age > 120) {
+    return 'Please enter a reasonable age';
+  }
+
+  return null;
+}
+
+//////////////////////////////////////////////////////////////
+/////              List to store children              ///////
+//////////////////////////////////////////////////////////////
+List<ChildModel> childrenList = [];
+
+final ImagePicker picker = ImagePicker();
+File? selectedImage;
