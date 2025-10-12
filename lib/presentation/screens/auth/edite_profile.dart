@@ -62,6 +62,7 @@ class _EditeProfileState extends State<EditeProfile> {
                 ),
                 const SizedBox(height: 30),
                 CustomTextFormField(
+                  focusNode: editProfileNameFocus,
                   controller: editeProfileName,
                   hintText: 'Full Name',
                   icon: Icons.person,
@@ -69,6 +70,7 @@ class _EditeProfileState extends State<EditeProfile> {
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField(
+                  focusNode: editProfileEmailFocus,
                   controller: editProfileEmail,
                   hintText: 'Email',
                   icon: Icons.email,
@@ -76,6 +78,7 @@ class _EditeProfileState extends State<EditeProfile> {
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField(
+                  focusNode: editProfileTagNameFocus,
                   controller: editProfileTagName,
                   hintText: 'Tag Name',
                   icon: Icons.person,

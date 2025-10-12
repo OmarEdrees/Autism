@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
+import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
+import 'package:autism/presentation/screens/complete_doctor_profile.dart';
 import 'package:autism/presentation/widgets/on_boarding/on_boarding_models.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,11 +37,35 @@ List<OnBoardingScreenWidget> steps = [
 final TextEditingController emailController = TextEditingController();
 final TextEditingController passController = TextEditingController();
 final TextEditingController confirmPassController = TextEditingController();
+final TextEditingController fullNameController = TextEditingController();
+final TextEditingController phoneController = TextEditingController();
 final TextEditingController addChildName = TextEditingController();
 final TextEditingController addChildAge = TextEditingController();
 final TextEditingController editeProfileName = TextEditingController();
 final TextEditingController editProfileEmail = TextEditingController();
 final TextEditingController editProfileTagName = TextEditingController();
+final specialtyController = TextEditingController();
+final qualificationController = TextEditingController();
+final bioController = TextEditingController();
+final clinicAddressController = TextEditingController();
+
+//////////////////////////////////////////////////////////////
+//////////////         FocusNode            //////////////////
+//////////////////////////////////////////////////////////////
+final FocusNode emailFocus = FocusNode();
+final FocusNode passFocus = FocusNode();
+final FocusNode confirmPassFocus = FocusNode();
+final FocusNode fullNameFocus = FocusNode();
+final FocusNode phoneFocus = FocusNode();
+final FocusNode addChildNameFocus = FocusNode();
+final FocusNode addChildAgeFocus = FocusNode();
+final FocusNode editProfileNameFocus = FocusNode();
+final FocusNode editProfileEmailFocus = FocusNode();
+final FocusNode editProfileTagNameFocus = FocusNode();
+final FocusNode specialtyControllerFocus = FocusNode();
+final FocusNode qualificationControllerFocus = FocusNode();
+final FocusNode bioControllerFocus = FocusNode();
+final FocusNode clinicAddressControllerFocus = FocusNode();
 
 //////////////////////////////////////////////////////////////
 //////////////         validator            //////////////////
@@ -122,10 +148,58 @@ String? addChildAgeValidator(String? value) {
   return null;
 }
 
+/////////////////////////////////////////////////////////////
+String? phoneValidator(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Please enter phone number';
+  }
+  // رقم الهاتف يجب أن يكون من 10 أرقام
+  if (!RegExp(r'^[0-9]{11}$').hasMatch(value)) {
+    return 'Please enter a valid 11-digit phone number';
+  }
+  return null;
+}
+
+///////////////////////////////////////////////////////////////
+
+String? completeDoctor(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'required';
+  }
+  return null;
+}
+
 //////////////////////////////////////////////////////////////
 /////              List to store children              ///////
 //////////////////////////////////////////////////////////////
 List<ChildModel> childrenList = [];
 
+//////////////////////////////////////////////////////////////
+/////              select image variables              ///////
+//////////////////////////////////////////////////////////////
 final ImagePicker picker = ImagePicker();
 File? selectedImage;
+
+//////////////////////////////////////////////////////////////
+/////             select doctor or parent              ///////
+//////////////////////////////////////////////////////////////
+String userRole = '';
+
+void onSignUpSuccess(BuildContext context) {
+  if (userRole == 'doctor') {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const CompleteDoctorProfile()),
+    );
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const SignInScreen()),
+    );
+  }
+}
+
+//////////////////////////////////////////////////////////////
+////////////             is loading              /////////////
+//////////////////////////////////////////////////////////////
+bool isLoading = false;

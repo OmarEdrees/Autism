@@ -42,6 +42,7 @@ class SignInScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   CustomTextFormField(
+                    focusNode: emailFocus,
                     validator: emailValidator,
                     controller: emailController,
                     hintText: 'Enter Your Email',
@@ -49,6 +50,7 @@ class SignInScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   CustomTextFormField(
+                    focusNode: passFocus,
                     validator: passwordValidator,
                     controller: passController,
                     hintText: 'Enter Your Password',

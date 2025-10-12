@@ -1,6 +1,4 @@
-import 'package:autism/logic/services/colors_app.dart';
 import 'package:autism/logic/services/variables_app.dart';
-import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
 import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
 import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -11,7 +9,8 @@ class SupabaseServices {
   //////////////////////////////////////////////////////////////
   /////////             Future of signup              //////////
   //////////////////////////////////////////////////////////////
-  void signUp(BuildContext context) async {
+  final supabase = Supabase.instance.client;
+  void signUp(BuildContext context, String email, String password) async {
     final response = await Supabase.instance.client.auth.signUp(
       email: emailController.text,
       password: passController.text,
@@ -19,7 +18,6 @@ class SupabaseServices {
     );
 
     if (!context.mounted) return;
-
     if (response.user != null) {
       AwesomeDialog? dialog;
 
@@ -32,10 +30,11 @@ class SupabaseServices {
         desc:
             "We sent you a confirmation link. Please verify your account before logging in.",
         btnOkOnPress: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => SignInScreen()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => SignInScreen()),
+          // );
+          onSignUpSuccess(context);
         },
       )..show();
       dialog;
@@ -127,22 +126,4 @@ class SupabaseServices {
       },
     );
   }
-
-  // void _showSignUpDialog(BuildContext context) async {
-  //   await AwesomeDialog(
-  //     context: context,
-  //     dialogType: DialogType.warning,
-  //     animType: AnimType.bottomSlide,
-  //     title: 'Account not found',
-  //     desc: 'You don\'t have an account yet. Do you want to sign up?',
-  //     btnCancelOnPress: () {},
-  //     btnOkText: "Sign Up",
-  //     btnOkOnPress: () {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => SignUpScreen()),
-  //       );
-  //     },
-  //   ).show();
-  // }
 }

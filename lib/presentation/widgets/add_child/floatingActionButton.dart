@@ -108,6 +108,7 @@ class _FloatingActionButtonWidgetState
                   ),
                   const SizedBox(height: 15),
                   CustomTextFormField(
+                    focusNode: addChildNameFocus,
                     validator: addChildNameValidator,
                     controller: addChildName,
                     hintText: 'Enter the name',
@@ -116,6 +117,7 @@ class _FloatingActionButtonWidgetState
 
                   const SizedBox(height: 15),
                   CustomTextFormField(
+                    focusNode: addChildAgeFocus,
                     validator: addChildAgeValidator,
                     controller: addChildAge,
                     hintText: 'Enter the age',

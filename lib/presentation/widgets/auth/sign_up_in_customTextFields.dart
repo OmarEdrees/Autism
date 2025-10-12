@@ -1,4 +1,3 @@
-import 'package:autism/logic/services/variables_app.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatefulWidget {
@@ -7,6 +6,8 @@ class CustomTextFormField extends StatefulWidget {
   final bool isPassword;
   final TextEditingController controller;
   final String? Function(String?)? validator;
+  final FocusNode focusNode;
+  final int maxLines;
 
   const CustomTextFormField({
     super.key,
@@ -15,6 +16,8 @@ class CustomTextFormField extends StatefulWidget {
     required this.icon,
     this.isPassword = false,
     required this.validator,
+    required this.focusNode,
+    this.maxLines = 1,
   });
 
   @override
@@ -27,6 +30,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      maxLines: widget.maxLines,
+      focusNode: widget.focusNode,
+      textInputAction: TextInputAction.next,
       controller: widget.controller,
       validator: widget.validator,
       obscureText: widget.isPassword ? _obscureText : false,
@@ -39,6 +45,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(color: Colors.black, width: 3),
         ),
+
         hintText: widget.hintText,
         hintStyle: TextStyle(color: Colors.grey[600]),
         prefixIcon: Padding(

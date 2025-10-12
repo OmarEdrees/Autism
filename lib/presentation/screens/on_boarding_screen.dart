@@ -2,6 +2,7 @@ import 'package:autism/logic/services/sized_config.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
 import 'package:autism/logic/cubit/on_bording/on_boarding_cubit.dart';
+import 'package:autism/presentation/screens/role_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,7 +35,7 @@ class OnBoardingScreen extends StatelessWidget {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignInScreen(),
+                                builder: (context) => RoleSelectionScreen(),
                               ),
                             );
                           },
@@ -72,7 +73,7 @@ class OnBoardingScreen extends StatelessWidget {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignInScreen(),
+                                builder: (context) => RoleSelectionScreen(),
                               ),
                             );
                           } else {
