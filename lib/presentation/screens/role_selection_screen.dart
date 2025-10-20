@@ -1,6 +1,6 @@
 import 'package:autism/logic/services/colors_app.dart';
 import 'package:autism/logic/services/variables_app.dart';
-import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
+import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   userRole = 'doctor';
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUpScreen()),
+                    MaterialPageRoute(builder: (context) => SignInScreen()),
                   );
                 },
                 child: Container(
@@ -60,7 +60,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   userRole = 'parent';
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUpScreen()),
+                    MaterialPageRoute(builder: (context) => SignInScreen()),
                   );
                 },
                 child: Container(

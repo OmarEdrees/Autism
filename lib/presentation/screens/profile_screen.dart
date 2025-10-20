@@ -1,5 +1,5 @@
 import 'package:autism/logic/services/variables_app.dart';
-import 'package:autism/presentation/screens/add_child.dart';
+import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/auth/edite_profile.dart';
 import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
 import 'package:autism/presentation/widgets/profile/buildListTile.dart';
@@ -129,7 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AddChild()),
+                    MaterialPageRoute(builder: (context) => AddChildScreen()),
                   );
                 },
               ),

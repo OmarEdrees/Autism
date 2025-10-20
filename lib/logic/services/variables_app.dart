@@ -1,11 +1,15 @@
 import 'dart:io';
 
 import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
-import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
-import 'package:autism/presentation/screens/complete_doctor_profile.dart';
+import 'package:autism/logic/services/colors_app.dart';
+import 'package:autism/presentation/screens/parents/add_child_screen.dart';
+import 'package:autism/presentation/screens/doctors/complete_doctor_profile_screen.dart';
+import 'package:autism/presentation/screens/home_screen.dart';
+import 'package:autism/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:autism/presentation/widgets/on_boarding/on_boarding_models.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 //////////////////////////////////////////////////////////////
 ///////            List of onboarding steps            ///////
@@ -41,13 +45,17 @@ final TextEditingController fullNameController = TextEditingController();
 final TextEditingController phoneController = TextEditingController();
 final TextEditingController addChildName = TextEditingController();
 final TextEditingController addChildAge = TextEditingController();
+final TextEditingController addChildhobbies = TextEditingController();
+final TextEditingController addChilddiagnosis = TextEditingController();
+final TextEditingController addChildbirthdate = TextEditingController();
 final TextEditingController editeProfileName = TextEditingController();
 final TextEditingController editProfileEmail = TextEditingController();
 final TextEditingController editProfileTagName = TextEditingController();
-final specialtyController = TextEditingController();
-final qualificationController = TextEditingController();
-final bioController = TextEditingController();
-final clinicAddressController = TextEditingController();
+final TextEditingController specialtyController = TextEditingController();
+final TextEditingController qualificationController = TextEditingController();
+final TextEditingController bioController = TextEditingController();
+final TextEditingController clinicAddressController = TextEditingController();
+final TextEditingController doctorsScreenSearch = TextEditingController();
 
 //////////////////////////////////////////////////////////////
 //////////////         FocusNode            //////////////////
@@ -59,6 +67,9 @@ final FocusNode fullNameFocus = FocusNode();
 final FocusNode phoneFocus = FocusNode();
 final FocusNode addChildNameFocus = FocusNode();
 final FocusNode addChildAgeFocus = FocusNode();
+final FocusNode addChildhobbiesFocus = FocusNode();
+final FocusNode addChilddiagnosisFocus = FocusNode();
+final FocusNode addChildbirthdateFocus = FocusNode();
 final FocusNode editProfileNameFocus = FocusNode();
 final FocusNode editProfileEmailFocus = FocusNode();
 final FocusNode editProfileTagNameFocus = FocusNode();
@@ -66,6 +77,7 @@ final FocusNode specialtyControllerFocus = FocusNode();
 final FocusNode qualificationControllerFocus = FocusNode();
 final FocusNode bioControllerFocus = FocusNode();
 final FocusNode clinicAddressControllerFocus = FocusNode();
+final FocusNode doctorsScreenSearchFocus = FocusNode();
 
 //////////////////////////////////////////////////////////////
 //////////////         validator            //////////////////
@@ -164,7 +176,7 @@ String? phoneValidator(String? value) {
 
 String? completeDoctor(String? value) {
   if (value == null || value.isEmpty) {
-    return 'required';
+    return 'Please fill the field';
   }
   return null;
 }
@@ -189,17 +201,14 @@ void onSignUpSuccess(BuildContext context) {
   if (userRole == 'doctor') {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const CompleteDoctorProfile()),
+      MaterialPageRoute(
+        builder: (context) => const CompleteDoctorProfileScreen(),
+      ),
     );
   } else {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const SignInScreen()),
+      MaterialPageRoute(builder: (context) => const MainBottomNav()),
     );
   }
 }
-
-//////////////////////////////////////////////////////////////
-////////////             is loading              /////////////
-//////////////////////////////////////////////////////////////
-bool isLoading = false;

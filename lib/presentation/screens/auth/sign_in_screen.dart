@@ -1,10 +1,17 @@
+import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
 import 'package:autism/logic/services/sized_config.dart';
+import 'package:autism/presentation/screens/parents/add_child_screen.dart';
+import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_SocialButton.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
 import 'package:autism/logic/services/supabase_services.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
+import 'package:autism/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -76,9 +83,33 @@ class SignInScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 15),
                   GestureDetector(
-                    onTap: () {
-                      SupabaseServices().signIn(context);
-                      print('0000000000000000000000000000000000000000');
+                    onTap: () async {
+                      await SupabaseServices().signIn(context);
+
+                      final user = Supabase.instance.client.auth.currentUser;
+                      if (user != null) {
+                        // 👇 استدعاء الجلب بعد تسجيل الدخول
+                        await context
+                            .read<ChildrenCubit>()
+                            .fetchChildrenForCurrentUser();
+
+                        final currentUser =
+                            await Supabase.instance.client.auth.currentUser;
+                        if (currentUser != null) {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setString('parent_id', currentUser.id);
+                        }
+
+                        // 👇 بعدين روح على صفحة AddChild
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => userRole == 'doctor'
+                                ? HomeScreen()
+                                : MainBottomNav(),
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       width: double.infinity,

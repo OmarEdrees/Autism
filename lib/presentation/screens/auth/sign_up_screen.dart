@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:autism/logic/services/sign_up_services/save_profile_user_data.dart';
 import 'package:autism/logic/services/sized_config.dart';
 import 'package:autism/logic/services/supabase_services.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
@@ -6,10 +7,11 @@ import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpScreen extends StatefulWidget {
-  SignUpScreen({super.key});
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -19,9 +21,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   File? _selectedImage;
   final _picker = ImagePicker();
-  final user = Supabase.instance.client.auth.currentUser;
 
-  Future<void> _pickImage() async {
+  Future<void> pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
       setState(() {
@@ -30,73 +31,73 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  Future<String?> _uploadImage(File file) async {
-    try {
-      final fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final response = await Supabase.instance.client.storage
-          .from('profiles_images') // اسم الـ bucket في Supabase
-          .upload(fileName, file);
+  // Future<String?> uploadImage(File file) async {
+  //   try {
+  //     final currentUser = Supabase.instance.client.auth.currentUser;
+  //     if (currentUser == null) {
+  //       debugPrint('No user is currently logged in while uploading the image');
+  //       return null;
+  //     }
+  //     final fileName =
+  //         'profile_${currentUser.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      final publicUrl = Supabase.instance.client.storage
-          .from('profiles_images')
-          .getPublicUrl(fileName);
+  //     // رفع الملف
+  //     await Supabase.instance.client.storage
+  //         .from('profiles_images')
+  //         .upload(fileName, file);
 
-      return publicUrl;
-    } catch (e) {
-      debugPrint('Upload error: $e');
-      return null;
-    }
-  }
+  //     // جلب الرابط العام بعد الرفع
+  //     final publicUrl = Supabase.instance.client.storage
+  //         .from('profiles_images')
+  //         .getPublicUrl(fileName);
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passController.dispose();
-    confirmPassController.dispose();
-    fullNameController.dispose();
-    phoneController.dispose();
-    super.dispose();
-  }
+  //     return publicUrl;
+  //   } catch (e) {
+  //     debugPrint('Upload error: $e');
+  //     return null;
+  //   }
+  // }
 
-  Future<void> _saveProfilesData() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => isLoading = true);
-    String? imageUrl;
-    if (_selectedImage != null) {
-      imageUrl = await _uploadImage(_selectedImage!);
-    }
-    try {
-      await Supabase.instance.client.from('profiles').insert({
-        'id': user!.id,
-        'email': emailController.text.trim(),
-        'full_name': fullNameController.text.trim(),
-        'phone': phoneController.text.trim(),
-        'avatar_url': imageUrl ?? '',
-        'role': userRole,
-      });
+  // Future<void> saveProfilesData() async {
+  //   if (!_formKey.currentState!.validate()) return;
+  //   String? imageUrl;
+  //   final parentUser = Supabase.instance.client.auth.currentUser;
+  //   if (parentUser == null) {
+  //     debugPrint('No user currently logged in');
+  //     return;
+  //   }
+  //   if (_selectedImage != null) {
+  //     imageUrl = await uploadImage(_selectedImage!);
+  //   }
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('parent_id', parentUser.id);
+  //   print('✅ Parent ID saved55555555555555555555: ${parentUser.id}');
+  //   try {
+  //     final response = await Supabase.instance.client.from('profiles').insert({
+  //       'id': parentUser.id,
+  //       'email': emailController.text.trim(),
+  //       'full_name': fullNameController.text.trim(),
+  //       'phone': phoneController.text.trim(),
+  //       'avatar_url': imageUrl ?? '',
+  //       'role': userRole,
+  //     });
 
-      if (user == null) {
-        print('User is null. Did you sign up and verify email?');
-      } else {
-        print('User IDdddddddddddddddddddddddddddddddddd: ${user!.id}');
-      }
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('The data has been saved successfully')),
+  //     );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('تم حفظ البيانات بنجاح ✅')));
-      print(
-        '888888888888888888888888888888888888888888888888888888888888888888888',
-      );
-      //Navigator.pop(context);
-    } catch (e) {
-      debugPrint('Insert errorrrrrrrrrrrrrrrrrrrrrrr: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
+  //     return response;
+  //   } catch (e) {
+  //     debugPrint('Insert error: $e');
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text('error: $e')));
+  //   }
+  // }
+
+  final saveProfileUserData = SaveProfileUserData();
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +116,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     child: GestureDetector(
-                      onTap: _pickImage,
+                      onTap: () {
+                        pickImage();
+                      },
                       child: CircleAvatar(
                         radius: 80,
                         backgroundImage: _selectedImage != null
@@ -220,15 +223,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 15),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       if (_formKey.currentState!.validate()) {
-                        SupabaseServices().signUp(
+                        // 1️⃣ تنفيذ signUp أولاً وانتظاره
+                        await SupabaseServices().signUp(
                           context,
                           emailController.text.trim(),
                           passController.text.trim(),
                         );
-                        _saveProfilesData();
-                      } else {}
+                        // 2️⃣ بعد ما يخلص signUp، ينفذ حفظ البيانات
+                        await saveProfileUserData.saveProfilesData(
+                          context: context,
+                          formKey: _formKey,
+                          email: emailController.text.trim(),
+                          fullName: fullNameController.text.trim(),
+                          phone: phoneController.text.trim(),
+                          role: userRole,
+                          imageFile: _selectedImage,
+                        );
+                      }
                     },
                     child: Container(
                       width: double.infinity,
@@ -248,6 +261,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: 15),
                   Center(
                     child: Text(

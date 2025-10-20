@@ -8,6 +8,8 @@ class CustomTextFormField extends StatefulWidget {
   final String? Function(String?)? validator;
   final FocusNode focusNode;
   final int maxLines;
+  final void Function() onTap;
+  final bool readOnly;
 
   const CustomTextFormField({
     super.key,
@@ -18,7 +20,11 @@ class CustomTextFormField extends StatefulWidget {
     required this.validator,
     required this.focusNode,
     this.maxLines = 1,
+    this.onTap = _defaultOnTap,
+    this.readOnly = false,
   });
+
+  static void _defaultOnTap() {}
 
   @override
   State<CustomTextFormField> createState() => _CustomTextFormFieldState();
@@ -30,6 +36,8 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
       maxLines: widget.maxLines,
       focusNode: widget.focusNode,
       textInputAction: TextInputAction.next,
