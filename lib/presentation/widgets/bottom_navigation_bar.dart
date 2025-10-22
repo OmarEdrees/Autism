@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
+
 import 'package:autism/presentation/screens/parents/BottomNavigationBar/chats_screen.dart';
 import 'package:autism/presentation/screens/parents/BottomNavigationBar/doctors_screen.dart';
 import 'package:autism/presentation/screens/parents/BottomNavigationBar/games_screen.dart';
 import 'package:autism/presentation/screens/parents/BottomNavigationBar/tips_screen.dart';
-import 'package:autism/presentation/screens/profile_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:autism/presentation/screens/parents/BottomNavigationBar/settings_screen.dart';
+import 'package:autism/logic/services/colors_app.dart';
 
 class MainBottomNav extends StatefulWidget {
   const MainBottomNav({super.key});
@@ -12,58 +15,41 @@ class MainBottomNav extends StatefulWidget {
   State<MainBottomNav> createState() => _MainBottomNavState();
 }
 
-class _MainBottomNavState extends State<MainBottomNav> {
+class _MainBottomNavState extends State<MainBottomNav>
+    with TickerProviderStateMixin {
   int _selectedIndex = 1;
 
-  final List<Widget> _pages = [
+  final List<Widget> _pages = const [
     TipsScreen(),
     DoctorsScreen(),
     ChatsScreen(),
     GamesScreen(),
-    ProfilePage(),
+    SettingsScreen(),
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: const Color(0xFFFF7F3E),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.lightbulb_outline),
-            label: 'Tips',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_hospital_outlined),
-            label: 'Doctors',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: 'Chats',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.videogame_asset_outlined),
-            label: 'Games',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            label: 'Settings',
-          ),
+      bottomNavigationBar: MotionTabBar(
+        initialSelectedTab: "Doctors",
+        labels: const ["Tips", "Doctors", "Chats", "Games", "Settings"],
+        icons: const [
+          Icons.lightbulb_outline,
+          Icons.local_hospital_outlined,
+          Icons.chat_bubble_outline,
+          Icons.videogame_asset_outlined,
+          Icons.settings_outlined,
         ],
+        tabIconColor: Colors.grey,
+        tabIconSelectedColor: Colors.white,
+        tabSelectedColor: ColorsApp().primaryColor,
+        textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        onTabItemSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }

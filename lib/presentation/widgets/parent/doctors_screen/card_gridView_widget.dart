@@ -1,35 +1,37 @@
 import 'package:flutter/material.dart';
 
-class CardGridViewWidget extends StatefulWidget {
-  const CardGridViewWidget({super.key});
+class CardGridViewWidget extends StatelessWidget {
+  final String name;
+  final String specialty;
+  final String? imageUrl;
+  final Map<String, dynamic> doctor;
 
-  @override
-  State<CardGridViewWidget> createState() => _CardGridViewWidgetState();
-}
+  const CardGridViewWidget({
+    super.key,
+    required this.name,
+    required this.specialty,
+    this.imageUrl,
+    required this.doctor,
+  });
 
-class _CardGridViewWidgetState extends State<CardGridViewWidget> {
   @override
   Widget build(BuildContext context) {
+    final profile = doctor['profiles'];
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.only(bottom: 5),
           height: 180,
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                offset: Offset.fromDirection(1.5, 1.5),
-                color: Colors.grey,
-                blurStyle: BlurStyle.normal,
-                blurRadius: 0.5,
-                spreadRadius: 0.2,
+                offset: const Offset(2, 2),
+                color: Colors.grey.withOpacity(0.3),
+                blurRadius: 3,
               ),
             ],
-
             color: Colors.white,
             borderRadius: BorderRadius.circular(15),
           ),
-
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,36 +40,37 @@ class _CardGridViewWidgetState extends State<CardGridViewWidget> {
                 width: double.infinity,
                 height: 120,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(15),
                     topRight: Radius.circular(15),
                   ),
                   image: DecorationImage(
-                    image: AssetImage('assets/images/doctors4.jpg'),
+                    image: profile != null && profile['avatar_url'] != null
+                        ? NetworkImage(profile['avatar_url'])
+                        : const AssetImage('assets/images/doctors4.jpg')
+                              as ImageProvider,
                     fit: BoxFit.cover,
                   ),
                 ),
-                // child: ClipRRect(
-                //   borderRadius: BorderRadius.only(
-                //     topLeft: Radius.circular(15),
-                //     topRight: Radius.circular(15),
-                //   ),
-                //   child: Image.asset('assets/images/doctor.webp', fit: BoxFit.fill),
-                // ),
               ),
-              Spacer(),
+              const Spacer(),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  'Dr. John Doe',
+                  profile != null
+                      ? profile['full_name'] ?? 'Unknown'
+                      : 'Unknown',
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.only(left: 8, bottom: 6),
                 child: Text(
-                  'Pediatric Specialist',
+                  doctor['specialty'] ?? 'Unknown specialty',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                 ),

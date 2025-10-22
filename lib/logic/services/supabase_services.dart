@@ -1,8 +1,6 @@
 import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
 import 'package:autism/logic/services/variables_app.dart';
-import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
-import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -7,8 +7,6 @@ import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

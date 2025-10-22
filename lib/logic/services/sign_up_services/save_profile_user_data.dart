@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:autism/logic/services/variables_app.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,15 +23,16 @@ class SaveProfileUserData {
         debugPrint('No user is currently logged in while uploading the image');
         return null;
       }
-      final fileName =
-          'profile_${currentUser.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final fileName = userRole == 'doctor'
+          ? 'doctor_${currentUser.id}_${DateTime.now().millisecondsSinceEpoch}.jpg'
+          : 'profile_${currentUser.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       await Supabase.instance.client.storage
-          .from('profiles_images')
+          .from(userRole == 'doctor' ? 'doctors_images' : 'profiles_images')
           .upload(fileName, file);
 
       final publicUrl = Supabase.instance.client.storage
-          .from('profiles_images')
+          .from(userRole == 'doctor' ? 'doctors_images' : 'profiles_images')
           .getPublicUrl(fileName);
 
       return publicUrl;

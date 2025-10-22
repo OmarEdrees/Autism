@@ -6,14 +6,14 @@ import 'package:autism/presentation/widgets/profile/buildListTile.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,82 +43,83 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // صورة البروفايل
-              CircleAvatar(
-                radius: 75,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: selectedImage != null
-                    ? FileImage(selectedImage!)
-                    : const AssetImage(
-                            'assets/images/autism-high-resolution-logo.png',
-                          )
-                          as ImageProvider, // ضع صورتك هنا
-              ),
-              const SizedBox(height: 15),
-              Text(
-                editeProfileName.text.isEmpty
-                    ? "Enter Your Name"
-                    : editeProfileName.text,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                editProfileTagName.text.isEmpty
-                    ? "Enter Your Tag Name"
-                    : editProfileTagName.text,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 15),
-              ElevatedButton(
-                onPressed: () async {
-                  final newImage = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => EditeProfile()),
-                  );
+        child: Column(
+          children: [
+            // صورة البروفايل
+            CircleAvatar(
+              radius: 75,
+              backgroundColor: Colors.grey[300],
+              backgroundImage: selectedImage != null
+                  ? FileImage(selectedImage!)
+                  : const AssetImage(
+                          'assets/images/autism-high-resolution-logo.png',
+                        )
+                        as ImageProvider, // ضع صورتك هنا
+            ),
+            const SizedBox(height: 15),
+            Text(
+              editeProfileName.text.isEmpty
+                  ? "Enter Your Name"
+                  : editeProfileName.text,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              editProfileTagName.text.isEmpty
+                  ? "Enter Your Tag Name"
+                  : editProfileTagName.text,
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () async {
+                final newImage = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditeProfile()),
+                );
 
-                  if (newImage != null) {
-                    setState(() {
-                      selectedImage = newImage;
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    side: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-                child: const Text(
-                  "Edit Profile",
-                  style: TextStyle(color: Colors.black),
+                if (newImage != null) {
+                  setState(() {
+                    selectedImage = newImage;
+                  });
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  side: const BorderSide(color: Colors.grey),
                 ),
               ),
-            ],
-          ),
+              child: const Text(
+                "Edit Profile",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
         ),
       ),
-      bottomNavigationBar: SingleChildScrollView(
-        child: Container(
-          height: 400,
-          padding: EdgeInsets.only(top: 10),
+      bottomNavigationBar: Container(
+        height: 350,
+        padding: EdgeInsets.only(top: 10),
 
-          alignment: Alignment.bottomCenter,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        alignment: Alignment.bottomCenter,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

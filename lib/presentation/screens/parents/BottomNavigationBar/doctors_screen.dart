@@ -1,7 +1,8 @@
-import 'package:autism/logic/services/colors_app.dart';
-import 'package:autism/logic/services/variables_app.dart';
+import 'package:autism/logic/services/doctors_screen/save_filter_doctors.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/card_gridView_widget.dart';
+import 'package:autism/presentation/widgets/parent/doctors_screen/filter_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:autism/logic/services/colors_app.dart';
 
 class DoctorsScreen extends StatefulWidget {
   const DoctorsScreen({super.key});
@@ -11,26 +12,77 @@ class DoctorsScreen extends StatefulWidget {
 }
 
 class _DoctorsScreenState extends State<DoctorsScreen> {
+  final TextEditingController doctorsScreenSearch = TextEditingController();
+  final DoctorService _doctorService = DoctorService();
+
+  List<dynamic> doctors = [];
+  List<dynamic> filteredDoctors = [];
+  String? selectedSpecialtyLabel;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDoctors();
+  }
+
+  Future<void> _loadDoctors() async {
+    setState(() => isLoading = true);
+    final doctorList = await _doctorService.loadDoctors();
+    setState(() {
+      doctors = doctorList;
+      filteredDoctors = doctorList;
+      isLoading = false;
+    });
+  }
+
+  Future<void> _filterDoctors(String specialty) async {
+    setState(() => isLoading = true);
+    final filtered = await _doctorService.filterDoctors(specialty);
+    setState(() {
+      filteredDoctors = filtered;
+      selectedSpecialtyLabel = specialty;
+      isLoading = false;
+    });
+  }
+
+  void _showFilterSheet() async {
+    final selected = await showFilterBottomSheet(context);
+    if (selected != null) {
+      await _filterDoctors(selected);
+    }
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      selectedSpecialtyLabel = null;
+      filteredDoctors = _doctorService.searchDoctors(doctors, value);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        color: Colors.grey[100],
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Text(
+                  const Text(
                     'Doctors',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Icon(Icons.medical_services, color: ColorsApp().primaryColor),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 15),
+
+              // 🔹 حقل البحث
               Row(
                 children: [
                   Expanded(
@@ -40,9 +92,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                       cursorColor: ColorsApp().primaryColor,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Colors.grey[200],
+                        fillColor: Colors.grey[300],
                         hintText: 'Search for doctors',
-
                         prefixIcon: Icon(
                           Icons.search,
                           color: ColorsApp().primaryColor,
@@ -52,48 +103,74 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onTap: () {},
+                      onChanged: _onSearchChanged,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     flex: 1,
-                    child: Container(
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.filter_list,
-                        color: ColorsApp().primaryColor,
+                    child: GestureDetector(
+                      onTap: _showFilterSheet,
+                      child: Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.filter_list,
+                          color: ColorsApp().primaryColor,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 30),
+
+              const SizedBox(height: 20),
+
+              // 🔹 العنوان
               Text(
-                'All Doctors',
-
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 15),
-              Expanded(
-                child: GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 0.8,
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemCount: 8,
-                  itemBuilder: (context, index) {
-                    return CardGridViewWidget();
-                  },
+                selectedSpecialtyLabel == null
+                    ? 'All Doctors'
+                    : '${selectedSpecialtyLabel!} Doctors',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                maxLines: 1,
+                softWrap: false,
+              ),
+
+              const SizedBox(height: 10),
+
+              // 🔹 عرض البيانات
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : filteredDoctors.isEmpty
+                    ? const Center(child: Text('No doctors found'))
+                    : GridView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: 0.85,
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 8,
+                            ),
+                        itemCount: filteredDoctors.length,
+                        itemBuilder: (context, index) {
+                          final doctor = filteredDoctors[index];
+                          return CardGridViewWidget(
+                            name: doctor['profiles']?['full_name'] ?? 'Unknown',
+                            specialty: doctor['specialty'] ?? '',
+                            imageUrl: doctor['profiles']?['avatar_url'],
+                            doctor: doctor,
+                          );
+                        },
+                      ),
               ),
             ],
           ),

@@ -1,7 +1,6 @@
 import 'package:autism/logic/services/colors_app.dart';
+import 'package:autism/logic/services/variables_app.dart';
 import 'package:flutter/material.dart';
-
-String? selectedGender;
 
 //////////////////////////////////////////////////////////////
 ////////////           selectedGender            /////////////

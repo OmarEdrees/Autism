@@ -3,6 +3,7 @@ import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
+import 'package:autism/presentation/widgets/parent/doctors_screen/drop_down_specialty.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -29,7 +30,7 @@ class _CompleteDoctorProfileScreenState
     try {
       await Supabase.instance.client.from('doctors').insert({
         'id': user.id,
-        'specialty': specialtyController.text.trim(),
+        'specialty': selectedSpecialty!,
         'qualification': qualificationController.text.trim(),
         'bio': bioController.text.trim(),
         'clinic_address': clinicAddressController.text.trim(),
@@ -80,13 +81,8 @@ class _CompleteDoctorProfileScreenState
                     ),
                   ),
                   const SizedBox(height: 20),
-                  CustomTextFormField(
-                    controller: specialtyController,
-                    hintText: 'Specialty',
-                    icon: Icons.medical_services,
-                    validator: completeDoctor,
-                    focusNode: specialtyControllerFocus,
-                  ),
+                  dropDownSpecialty(),
+
                   const SizedBox(height: 15),
                   CustomTextFormField(
                     controller: qualificationController,
