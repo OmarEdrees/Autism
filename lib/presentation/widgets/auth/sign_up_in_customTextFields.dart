@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextFormField extends StatefulWidget {
   final String hintText;
@@ -10,6 +11,8 @@ class CustomTextFormField extends StatefulWidget {
   final int maxLines;
   final void Function() onTap;
   final bool readOnly;
+  final TextInputType keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextFormField({
     super.key,
@@ -22,6 +25,8 @@ class CustomTextFormField extends StatefulWidget {
     this.maxLines = 1,
     this.onTap = _defaultOnTap,
     this.readOnly = false,
+    this.keyboardType = TextInputType.emailAddress,
+    this.inputFormatters = const <TextInputFormatter>[],
   });
 
   static void _defaultOnTap() {}
@@ -36,6 +41,8 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      inputFormatters: widget.inputFormatters,
+      keyboardType: widget.keyboardType,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
       maxLines: widget.maxLines,

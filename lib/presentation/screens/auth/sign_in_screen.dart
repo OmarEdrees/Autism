@@ -8,14 +8,21 @@ import 'package:autism/logic/services/supabase_services.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
 import 'package:autism/presentation/widgets/bottom_navigation_bar.dart';
+import 'package:autism/presentation/screens/doctors/sessions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,31 +91,43 @@ class SignInScreen extends StatelessWidget {
                   SizedBox(height: 15),
                   GestureDetector(
                     onTap: () async {
-                      await SupabaseServices().signIn(context);
+                      if (_isLoading) return; // منع النقر المتكرر
+                      setState(() => _isLoading = true); // تشغيل التحميل
 
-                      final user = Supabase.instance.client.auth.currentUser;
-                      if (user != null) {
-                        // 👇 استدعاء الجلب بعد تسجيل الدخول
-                        await context
-                            .read<ChildrenCubit>()
-                            .fetchChildrenForCurrentUser();
+                      try {
+                        await SupabaseServices().signIn(context);
 
-                        final currentUser =
-                            await Supabase.instance.client.auth.currentUser;
-                        if (currentUser != null) {
+                        final user = Supabase.instance.client.auth.currentUser;
+                        if (user != null) {
+                          // 👇 استدعاء الجلب بعد تسجيل الدخول
+                          await context
+                              .read<ChildrenCubit>()
+                              .fetchChildrenForCurrentUser();
+
                           final prefs = await SharedPreferences.getInstance();
-                          await prefs.setString('parent_id', currentUser.id);
-                        }
+                          await prefs.setString('parent_id', user.id);
 
-                        // 👇 بعدين روح على صفحة AddChild
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => userRole == 'doctor'
-                                ? HomeScreen()
-                                : MainBottomNav(),
+                          // 👇 الانتقال إلى الصفحة المناسبة
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => userRole == 'doctor'
+                                  ? SessionsScreen()
+                                  : MainBottomNav(),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('❌ Error: $e'),
+                            backgroundColor: Colors.red,
                           ),
                         );
+                      } finally {
+                        setState(
+                          () => _isLoading = false,
+                        ); // إيقاف التحميل مهما كانت النتيجة
                       }
                     },
                     child: Container(
@@ -119,16 +138,73 @@ class SignInScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
-                        child: Text(
-                          'Sign In',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),
+
+                  // GestureDetector(
+                  //   onTap: () async {
+                  //     await SupabaseServices().signIn(context);
+
+                  //     final user = Supabase.instance.client.auth.currentUser;
+                  //     if (user != null) {
+                  //       // 👇 استدعاء الجلب بعد تسجيل الدخول
+                  //       await context
+                  //           .read<ChildrenCubit>()
+                  //           .fetchChildrenForCurrentUser();
+
+                  //       final currentUser =
+                  //           await Supabase.instance.client.auth.currentUser;
+                  //       if (currentUser != null) {
+                  //         final prefs = await SharedPreferences.getInstance();
+                  //         await prefs.setString('parent_id', currentUser.id);
+                  //       }
+
+                  //       // 👇 بعدين روح على صفحة AddChild
+                  //       Navigator.pushReplacement(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => userRole == 'doctor'
+                  //               ? HomeScreen()
+                  //               : MainBottomNav(),
+                  //         ),
+                  //       );
+                  //     }
+                  //   },
+                  //   child: Container(
+                  //     width: double.infinity,
+                  //     height: 50,
+                  //     decoration: BoxDecoration(
+                  //       color: Color(0xFFFF7F3E),
+                  //       borderRadius: BorderRadius.circular(25),
+                  //     ),
+                  //     child: Center(
+                  //       child: Text(
+                  //         'Sign In',
+                  //         style: TextStyle(
+                  //           color: Colors.white,
+                  //           fontWeight: FontWeight.bold,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 20),
                   Center(
                     child: Text(

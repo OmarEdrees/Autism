@@ -3,6 +3,7 @@ import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
+import 'package:autism/presentation/screens/doctors/sessions_screen.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/drop_down_specialty.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -45,7 +46,7 @@ class _CompleteDoctorProfileScreenState
         context,
         MaterialPageRoute(
           builder: (context) {
-            return userRole == 'doctor' ? HomeScreen() : AddChildScreen();
+            return userRole == 'doctor' ? SessionsScreen() : AddChildScreen();
           },
         ),
       );
@@ -57,6 +58,7 @@ class _CompleteDoctorProfileScreenState
     }
   }
 
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,8 +113,34 @@ class _CompleteDoctorProfileScreenState
                   const SizedBox(height: 20),
 
                   GestureDetector(
-                    onTap: () {
-                      _saveDoctorData();
+                    onTap: () async {
+                      if (_isLoading) return; // منع النقر المتكرر
+
+                      setState(() => _isLoading = true); // تشغيل التحميل
+
+                      try {
+                        await _saveDoctorData(); // 🔹 تنفيذ دالة حفظ البيانات
+
+                        // ✅ رسالة نجاح (اختياري)
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('✅ Doctor data saved successfully!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        // ❌ في حال وجود خطأ
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('❌ Error: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } finally {
+                        setState(() => _isLoading = false); // إيقاف التحميل
+                      }
                     },
                     child: Container(
                       width: double.infinity,
@@ -122,13 +150,22 @@ class _CompleteDoctorProfileScreenState
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
-                        child: Text(
-                          'Add',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : const Text(
+                                'Add',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),

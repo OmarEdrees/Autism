@@ -38,7 +38,41 @@ class ChildService {
     });
   }
 
-  Future<String?> saveChildData({
+  // Future<String?> saveChildData({
+  //   required String name,
+  //   required String gender,
+  //   required String birthdate,
+  //   required int age,
+  //   required String diagnosis,
+  //   required String hobbies,
+  //   File? imageFile,
+  // }) async {
+  //   final user = _supabase.auth.currentUser;
+  //   if (user == null) return null;
+
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final parentId = prefs.getString('parent_id');
+  //   if (parentId == null) return null;
+
+  //   String? imageUrl;
+  //   if (imageFile != null) {
+  //     imageUrl = await uploadImage(file: imageFile, userId: user.id);
+  //   }
+
+  //   await insertChild(
+  //     parentId: parentId,
+  //     name: name,
+  //     gender: gender,
+  //     birthdate: birthdate,
+  //     age: age,
+  //     diagnosis: diagnosis,
+  //     hobbies: hobbies,
+  //     imageUrl: imageUrl,
+  //   );
+
+  //   return imageUrl;
+  // }
+  Future<Map<String, dynamic>?> saveChildData({
     required String name,
     required String gender,
     required String birthdate,
@@ -59,17 +93,22 @@ class ChildService {
       imageUrl = await uploadImage(file: imageFile, userId: user.id);
     }
 
-    await insertChild(
-      parentId: parentId,
-      name: name,
-      gender: gender,
-      birthdate: birthdate,
-      age: age,
-      diagnosis: diagnosis,
-      hobbies: hobbies,
-      imageUrl: imageUrl,
-    );
+    // هون منرجع الصف المضاف مشان ناخد الـ id
+    final response = await _supabase
+        .from('children')
+        .insert({
+          'parent_id': parentId,
+          'name': name,
+          'gender': gender,
+          'birthdate': birthdate,
+          'age': age,
+          'diagnosis': diagnosis,
+          'hobbies': hobbies,
+          'image_url': imageUrl,
+        })
+        .select('id, image_url')
+        .single(); // <–– هي أهم سطر
 
-    return imageUrl;
+    return {'id': response['id'], 'imageUrl': response['image_url']};
   }
 }

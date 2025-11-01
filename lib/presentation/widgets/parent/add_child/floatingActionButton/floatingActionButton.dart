@@ -8,6 +8,7 @@ import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FloatingActionButtonWidget extends StatefulWidget {
   const FloatingActionButtonWidget({super.key});
@@ -101,6 +102,7 @@ class _FloatingActionButtonWidgetState
                     ),
                     const SizedBox(height: 15),
                     CustomTextFormField(
+                      keyboardType: TextInputType.number,
                       focusNode: addChildAgeFocus,
                       validator: addChildAgeValidator,
                       controller: addChildAge,
@@ -127,16 +129,26 @@ class _FloatingActionButtonWidgetState
                     const SizedBox(height: 35),
                     GestureDetector(
                       onTap: () async {
-                        final uploadedImageUrl = await _childService
-                            .saveChildData(
-                              name: addChildName.text,
-                              gender: selectedGender!,
-                              birthdate: addChildbirthdate.text,
-                              age: int.parse(addChildAge.text),
-                              diagnosis: addChilddiagnosis.text,
-                              hobbies: addChildhobbies.text,
-                              imageFile: _selectedImage,
-                            );
+                        final result = await _childService.saveChildData(
+                          name: addChildName.text,
+                          gender: selectedGender!,
+                          birthdate: addChildbirthdate.text,
+                          age: int.parse(addChildAge.text),
+                          diagnosis: addChilddiagnosis.text,
+                          hobbies: addChildhobbies.text,
+                          imageFile: _selectedImage,
+                        );
+
+                        if (result == null) return;
+
+                        final uploadedImageUrl = result['imageUrl'];
+                        final childId =
+                            result['id']; // ← id المولّد من Supabase
+
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('child_id', childId);
+
+                        print('✅ Child ID from Supabase: $childId');
 
                         if (_formKey.currentState!.validate()) {
                           await context.read<ChildrenCubit>().addChild(
@@ -161,6 +173,7 @@ class _FloatingActionButtonWidgetState
                         addChildbirthdate.clear();
                         _selectedImage = null;
                       },
+
                       child: Container(
                         width: double.infinity,
                         height: 50,

@@ -1,0 +1,251 @@
+import 'package:autism/logic/services/colors_app.dart';
+import 'package:autism/logic/services/sessions_service/sessions_service.dart';
+import 'package:autism/logic/services/variables_app.dart';
+import 'package:autism/presentation/screens/doctors/sessions_data_screen.dart';
+import 'package:autism/presentation/widgets/doctors/sessions_screen/orders_tabs.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class SessionsScreen extends StatefulWidget {
+  const SessionsScreen({super.key});
+
+  @override
+  State<SessionsScreen> createState() => _SessionsScreenState();
+}
+
+class _SessionsScreenState extends State<SessionsScreen> {
+  late Future<List<dynamic>> futureSessions;
+  String currentStatus = "pending";
+
+  @override
+  void initState() {
+    super.initState();
+    loadSessions();
+  }
+
+  void loadSessions() {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      print("DEBUG: currentUser is null");
+      futureSessions = Future.value([]);
+      return;
+    }
+
+    final doctorId = user.id;
+    print("DEBUG: loadSessions -> doctorId: $doctorId, status: $currentStatus");
+
+    futureSessions = SessionsService().getDoctorSessions(
+      doctorId,
+      currentStatus,
+    );
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundImage: AssetImage("assets/images/doctors4.jpg"),
+                  ),
+                  SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Welcome Back",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Doctor",
+                        style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  Icon(
+                    Icons.notifications,
+                    size: 30,
+                    color: ColorsApp().primaryColor,
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20),
+              OrdersTabs(
+                onTabChange: (newStatus) {
+                  currentStatus = newStatus;
+                  loadSessions();
+                },
+              ),
+              SizedBox(height: 25),
+              Expanded(
+                child: FutureBuilder<List<dynamic>>(
+                  future: futureSessions,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+
+                    final sessions = snapshot.data!;
+
+                    if (sessions.isEmpty) {
+                      return Center(
+                        child: Text(
+                          "No Sessions Found",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ListView.separated(
+                      separatorBuilder: (_, __) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Divider(color: Colors.grey[300], thickness: 1.5),
+                      ),
+                      itemCount: sessions.length,
+                      itemBuilder: (context, index) {
+                        final s = sessions[index];
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SessionsDataScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Row(
+                              children: [
+                                FutureBuilder<String?>(
+                                  future: SessionsService().getChildImage(
+                                    s["child_id"],
+                                  ),
+                                  builder: (context, imgSnapshot) {
+                                    if (!imgSnapshot.hasData) {
+                                      return Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    final imageUrl = imgSnapshot.data;
+
+                                    return Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.grey[300],
+                                        image: imageUrl != null
+                                            ? DecorationImage(
+                                                image: NetworkImage(imageUrl),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : const DecorationImage(
+                                                image: AssetImage(
+                                                  "assets/images/doctors4.jpg",
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        s["title"] ?? "Session",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_month,
+                                            size: 18,
+                                            color: ColorsApp().primaryColor,
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            formatLocalDate(s["scheduled_at"]),
+                                            maxLines: 1,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey[700],
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: ColorsApp().primaryColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              "${s["duration_minutes"] ?? '?'} min",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

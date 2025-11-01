@@ -42,7 +42,12 @@ class _AddChildScreenState extends State<AddChildScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0, // لإزالة الظل
-          leading: Icon(Icons.arrow_back),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back),
+          ),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 15),
@@ -204,6 +209,16 @@ class _AddChildScreenState extends State<AddChildScreen> {
                                         context
                                             .read<ChildrenCubit>()
                                             .removeChild(index);
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Deleted successfully',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
                                       },
                                     ),
                                   ],

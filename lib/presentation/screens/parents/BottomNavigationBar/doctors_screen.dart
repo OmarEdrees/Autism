@@ -1,4 +1,5 @@
 import 'package:autism/logic/services/doctors_screen/save_filter_doctors.dart';
+import 'package:autism/presentation/screens/parents/doctor_details_screen.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/card_gridView_widget.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/filter_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +66,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     return Scaffold(
       body: Container(
         color: Colors.grey[100],
+
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: SafeArea(
           child: Column(
@@ -163,11 +165,23 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         itemCount: filteredDoctors.length,
                         itemBuilder: (context, index) {
                           final doctor = filteredDoctors[index];
-                          return CardGridViewWidget(
-                            name: doctor['profiles']?['full_name'] ?? 'Unknown',
-                            specialty: doctor['specialty'] ?? '',
-                            imageUrl: doctor['profiles']?['avatar_url'],
-                            doctor: doctor,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DoctorDetailsScreen(doctor: doctor),
+                                ),
+                              );
+                            },
+                            child: CardGridViewWidget(
+                              name:
+                                  doctor['profiles']?['full_name'] ?? 'Unknown',
+                              specialty: doctor['specialty'] ?? '',
+                              imageUrl: doctor['profiles']?['avatar_url'],
+                              doctor: doctor,
+                            ),
                           );
                         },
                       ),

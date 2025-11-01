@@ -1,3 +1,4 @@
+import 'package:autism/logic/services/settings_services/settings_services.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/auth/edite_profile.dart';
@@ -14,6 +15,20 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final profileService = ProfileService();
+  Map<String, dynamic>? profileData;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfile();
+  }
+
+  void loadProfile() async {
+    profileData = await profileService.getProfile();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,38 +66,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               backgroundColor: Colors.grey[300],
               backgroundImage: selectedImage != null
                   ? FileImage(selectedImage!)
-                  : const AssetImage(
-                          'assets/images/autism-high-resolution-logo.png',
+                  : NetworkImage(
+                          profileData?['avatar_url'] ??
+                              'assets/images/autism-high-resolution-logo.png',
                         )
                         as ImageProvider, // ضع صورتك هنا
             ),
             const SizedBox(height: 15),
             Text(
-              editeProfileName.text.isEmpty
-                  ? "Enter Your Name"
-                  : editeProfileName.text,
+              profileData?['full_name'] ?? '',
+
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 2),
             Text(
-              editProfileTagName.text.isEmpty
-                  ? "Enter Your Tag Name"
-                  : editProfileTagName.text,
+              profileData?['phone'] ?? '',
+
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                final newImage = await Navigator.push(
+                Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EditeProfile()),
-                );
-
-                if (newImage != null) {
-                  setState(() {
-                    selectedImage = newImage;
-                  });
-                }
+                  MaterialPageRoute(builder: (_) => EditeProfile()),
+                ).then((value) {
+                  if (value == true) {
+                    loadProfile(); // 👈 هذا سيعمل refresh تلقائي
+                  }
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,

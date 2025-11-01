@@ -19,6 +19,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   File? _selectedImage;
   final _picker = ImagePicker();
+  bool _isLoading = false;
 
   Future<void> pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
@@ -183,6 +184,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             const SizedBox(height: 15),
                             CustomTextFormField(
+                              keyboardType: TextInputType.number,
                               focusNode: phoneFocus,
                               validator: phoneValidator,
                               controller: phoneController,
@@ -222,23 +224,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 15),
                   GestureDetector(
                     onTap: () async {
+                      if (_isLoading) return; // منع النقر المتكرر
                       if (_formKey.currentState!.validate()) {
-                        // 1️⃣ تنفيذ signUp أولاً وانتظاره
-                        await SupabaseServices().signUp(
-                          context,
-                          emailController.text.trim(),
-                          passController.text.trim(),
-                        );
-                        // 2️⃣ بعد ما يخلص signUp، ينفذ حفظ البيانات
-                        await saveProfileUserData.saveProfilesData(
-                          context: context,
-                          formKey: _formKey,
-                          email: emailController.text.trim(),
-                          fullName: fullNameController.text.trim(),
-                          phone: phoneController.text.trim(),
-                          role: userRole,
-                          imageFile: _selectedImage,
-                        );
+                        if (!mounted) return;
+                        setState(() => _isLoading = true); // تشغيل التحميل
+                        try {
+                          // 1️⃣ تنفيذ signUp أولاً وانتظاره
+                          await SupabaseServices().signUp(
+                            context,
+                            emailController.text.trim(),
+                            passController.text.trim(),
+                          );
+                          if (!context.mounted) return;
+                          // 2️⃣ بعد ما يخلص signUp، ينفذ حفظ البيانات
+                          await saveProfileUserData.saveProfilesData(
+                            context: context,
+                            formKey: _formKey,
+                            email: emailController.text.trim(),
+                            fullName: fullNameController.text.trim(),
+                            phone: phoneController.text.trim(),
+                            role: userRole,
+                            imageFile: _selectedImage,
+                          );
+                        } catch (e) {
+                          // ❌ في حال حدوث خطأ
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('❌ Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } finally {
+                          if (!mounted) return;
+                          setState(
+                            () => _isLoading = false,
+                          ); // إيقاف التحميل مهما كانت النتيجة
+                        }
                       }
                     },
                     child: Container(
@@ -249,13 +271,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
-                        child: Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : const Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),

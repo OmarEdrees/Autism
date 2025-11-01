@@ -1,7 +1,4 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ChildModel {
@@ -11,7 +8,6 @@ class ChildModel {
   final String birthdate;
   final String diagnosis;
   final String hobbies;
-
   final String? imageUrl;
 
   ChildModel({
@@ -45,7 +41,9 @@ class ChildrenCubit extends Cubit<List<ChildModel>> {
     try {
       final response = await Supabase.instance.client
           .from('children')
-          .select()
+          .select(
+            'id, name, age, gender, birthdate, diagnosis, hobbies, image_url',
+          )
           .eq('parent_id', user.id);
 
       // حوّل البيانات إلى موديل

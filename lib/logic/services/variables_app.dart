@@ -8,7 +8,9 @@ import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:autism/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:autism/presentation/widgets/on_boarding/on_boarding_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 //////////////////////////////////////////////////////////////
@@ -50,12 +52,19 @@ final TextEditingController addChilddiagnosis = TextEditingController();
 final TextEditingController addChildbirthdate = TextEditingController();
 final TextEditingController editeProfileName = TextEditingController();
 final TextEditingController editProfileEmail = TextEditingController();
-final TextEditingController editProfileTagName = TextEditingController();
+final TextEditingController editProfilePhone = TextEditingController();
 final TextEditingController specialtyController = TextEditingController();
 final TextEditingController qualificationController = TextEditingController();
 final TextEditingController bioController = TextEditingController();
 final TextEditingController clinicAddressController = TextEditingController();
 final TextEditingController doctorsScreenSearch = TextEditingController();
+final TextEditingController doctorsDetailsScreenTitle = TextEditingController();
+final TextEditingController doctorsDetailsScreenDescription =
+    TextEditingController();
+final TextEditingController doctorsDetailsScreenScheduledAt =
+    TextEditingController();
+final TextEditingController doctorsDetailsScreenDurationMinutes =
+    TextEditingController();
 
 //////////////////////////////////////////////////////////////
 //////////////         FocusNode            //////////////////
@@ -72,12 +81,16 @@ final FocusNode addChilddiagnosisFocus = FocusNode();
 final FocusNode addChildbirthdateFocus = FocusNode();
 final FocusNode editProfileNameFocus = FocusNode();
 final FocusNode editProfileEmailFocus = FocusNode();
-final FocusNode editProfileTagNameFocus = FocusNode();
+final FocusNode editProfilePhoneFocus = FocusNode();
 final FocusNode specialtyControllerFocus = FocusNode();
 final FocusNode qualificationControllerFocus = FocusNode();
 final FocusNode bioControllerFocus = FocusNode();
 final FocusNode clinicAddressControllerFocus = FocusNode();
 final FocusNode doctorsScreenSearchFocus = FocusNode();
+final FocusNode doctorsDetailsScreenTitleFocus = FocusNode();
+final FocusNode doctorsDetailsScreenDescriptionFocus = FocusNode();
+final FocusNode doctorsDetailsScreenScheduledAtFocus = FocusNode();
+final FocusNode doctorsDetailsScreenDurationMinutesFocus = FocusNode();
 
 //////////////////////////////////////////////////////////////
 //////////////         validator            //////////////////
@@ -222,3 +235,122 @@ String? selectedGender;
 /////////            selectedSpecialty            ////////////
 //////////////////////////////////////////////////////////////
 String? selectedSpecialty;
+
+//////////////////////////////////////////////////////////////
+////////////      _infoCard_addChildScreen       /////////////
+//////////////////////////////////////////////////////////////
+Widget infoCard(IconData icon, String title, String value) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 4, bottom: 4),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
+      ),
+
+      Container(
+        margin: const EdgeInsets.only(bottom: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: ColorsApp().primaryColor.withOpacity(0.4)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: ColorsApp().primaryColor),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                value.isNotEmpty ? value : '—',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+//////////////////////////////////////////////////////////////
+////////////      duration_minutes_variable      /////////////
+//////////////////////////////////////////////////////////////
+String duration = doctorsDetailsScreenDurationMinutes.text; // "01:30"
+List<String> parts = duration.split(':');
+int totalMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+
+Future<void> pickDateTime(BuildContext context) async {
+  final date = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime.now(),
+    lastDate: DateTime(2100),
+  );
+
+  if (date == null) return;
+
+  final time = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.now(),
+  );
+
+  if (time == null) return;
+
+  final combined = DateTime(
+    date.year,
+    date.month,
+    date.day,
+    time.hour,
+    time.minute,
+  );
+
+  doctorsDetailsScreenScheduledAt.text = combined.toIso8601String();
+}
+
+class TimeTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length > 4) digits = digits.substring(0, 4);
+
+    String formatted = '';
+    if (digits.length <= 2) {
+      formatted = digits;
+    } else {
+      formatted =
+          '${digits.substring(0, digits.length - 2)}:${digits.substring(digits.length - 2)}';
+    }
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+//////////////////////////////////////////////////////////////
+////////////           formatLocalDate           /////////////
+//////////////////////////////////////////////////////////////
+String formatLocalDate(String dateTimeString) {
+  try {
+    final dt = DateTime.parse(dateTimeString).toLocal();
+    return DateFormat('yyyy-MM-dd').format(dt);
+  } catch (e) {
+    return dateTimeString; // fallback إذا صار خطأ
+  }
+}

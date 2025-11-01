@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:autism/logic/services/settings_services/settings_services.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,27 @@ class _EditeProfileState extends State<EditeProfile> {
         selectedImage = File(picked.path);
       });
     }
+  }
+
+  Map<String, dynamic>? profileData;
+  final profileService = ProfileService();
+
+  @override
+  void initState() {
+    super.initState();
+
+    loadProfile();
+  }
+
+  void loadProfile() async {
+    final data = await profileService.getProfile();
+    if (!mounted) return;
+    setState(() {
+      profileData = data;
+      editeProfileName.text = profileData?['full_name'] ?? '';
+      editProfileEmail.text = profileData?['email'] ?? '';
+      editProfilePhone.text = profileData?['phone'] ?? '';
+    });
   }
 
   @override
@@ -50,8 +72,13 @@ class _EditeProfileState extends State<EditeProfile> {
                     radius: 75,
                     backgroundImage: selectedImage != null
                         ? FileImage(selectedImage!)
+                        : profileData?['avatar_url'] != null
+                        ? NetworkImage(profileData!['avatar_url'])
+                              as ImageProvider
                         : null,
-                    child: selectedImage == null
+                    child:
+                        selectedImage == null &&
+                            profileData?['avatar_url'] == null
                         ? Icon(
                             Icons.camera_alt,
                             size: 40,
@@ -78,16 +105,18 @@ class _EditeProfileState extends State<EditeProfile> {
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField(
-                  focusNode: editProfileTagNameFocus,
-                  controller: editProfileTagName,
-                  hintText: 'Tag Name',
-                  icon: Icons.person,
+                  keyboardType: TextInputType.number,
+                  focusNode: editProfilePhoneFocus,
+                  controller: editProfilePhone,
+                  hintText: 'Phone',
+                  icon: Icons.phone,
                   validator: addChildNameValidator,
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context, selectedImage);
+                  onTap: () async {
+                    await profileService.updateProfile(context);
+                    Navigator.pop(context, true);
                   },
                   child: Container(
                     width: double.infinity,
