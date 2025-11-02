@@ -20,6 +20,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
   @override
   void initState() {
     super.initState();
+    loadDoctorName();
     loadSessions();
   }
 
@@ -39,6 +40,30 @@ class _SessionsScreenState extends State<SessionsScreen> {
       currentStatus,
     );
     setState(() {});
+  }
+
+  String doctorName = "";
+
+  Future<void> loadDoctorName() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+
+      setState(() {
+        doctorName = response['full_name'] ?? "Doctor";
+      });
+    } catch (e) {
+      print("❌ Error loading doctor name: $e");
+      setState(() {
+        doctorName = "Doctor";
+      });
+    }
   }
 
   @override
@@ -68,7 +93,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
                         ),
                       ),
                       Text(
-                        "Doctor",
+                        doctorName.isNotEmpty ? doctorName : "Doctor",
                         style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                       ),
                     ],
@@ -126,7 +151,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SessionsDataScreen(),
+                                builder: (context) =>
+                                    SessionsDataScreen(sessionData: s),
                               ),
                             );
                           },

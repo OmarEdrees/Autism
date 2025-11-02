@@ -289,7 +289,8 @@ Widget infoCard(IconData icon, String title, String value) {
 //////////////////////////////////////////////////////////////
 String duration = doctorsDetailsScreenDurationMinutes.text; // "01:30"
 List<String> parts = duration.split(':');
-int totalMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+int totalMinutes =
+    int.tryParse(duration.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
 
 Future<void> pickDateTime(BuildContext context) async {
   final date = await showDatePicker(

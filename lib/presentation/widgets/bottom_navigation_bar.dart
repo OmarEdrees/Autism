@@ -37,7 +37,7 @@ class _MainBottomNavState extends State<MainBottomNav>
         icons: const [
           Icons.lightbulb_outline,
           Icons.local_hospital_outlined,
-          Icons.chat_bubble_outline,
+          Icons.chat,
           Icons.videogame_asset_outlined,
           Icons.settings_outlined,
         ],

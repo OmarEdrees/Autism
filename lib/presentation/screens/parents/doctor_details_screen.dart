@@ -204,14 +204,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 CustomTextFormField(
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(4),
+                    LengthLimitingTextInputFormatter(2),
                     TimeTextInputFormatter(),
                   ],
                   keyboardType: TextInputType.number,
                   focusNode: doctorsDetailsScreenDurationMinutesFocus,
                   validator: completeDoctor,
                   controller: doctorsDetailsScreenDurationMinutes,
-                  hintText: '00:00',
+                  hintText: '00',
                   icon: Icons.timer,
                 ),
                 const SizedBox(height: 20),

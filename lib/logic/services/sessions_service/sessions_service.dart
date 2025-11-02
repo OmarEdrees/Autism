@@ -23,7 +23,7 @@ class SessionsService {
       final response = await supabase
           .from('sessions')
           .select(
-            'id, title, scheduled_at, duration_minutes, status, parent_id, child_id',
+            'id, title, description, scheduled_at, duration_minutes, status, parent_id, child_id',
           )
           .eq('doctor_id', doctorId)
           .eq('status', status)
