@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 
-import 'package:autism/presentation/screens/parents/BottomNavigationBar/chats_screen.dart';
-import 'package:autism/presentation/screens/parents/BottomNavigationBar/doctors_screen.dart';
-import 'package:autism/presentation/screens/parents/BottomNavigationBar/games_screen.dart';
-import 'package:autism/presentation/screens/parents/BottomNavigationBar/tips_screen.dart';
-import 'package:autism/presentation/screens/parents/BottomNavigationBar/settings_screen.dart';
+import 'package:autism/presentation/screens/parents/BottomNavigationBarParent/chats_screen.dart';
+import 'package:autism/presentation/screens/parents/BottomNavigationBarParent/doctors_screen.dart';
+import 'package:autism/presentation/screens/parents/BottomNavigationBarParent/games_screen.dart';
+import 'package:autism/presentation/screens/parents/BottomNavigationBarParent/tips_screen.dart';
+import 'package:autism/presentation/screens/parents/BottomNavigationBarParent/settings_screen.dart';
 import 'package:autism/logic/services/colors_app.dart';
 
-class MainBottomNav extends StatefulWidget {
-  const MainBottomNav({super.key});
+class MainBottomNavParent extends StatefulWidget {
+  const MainBottomNavParent({super.key});
 
   @override
-  State<MainBottomNav> createState() => _MainBottomNavState();
+  State<MainBottomNavParent> createState() => _MainBottomNavParentState();
 }
 
-class _MainBottomNavState extends State<MainBottomNav>
+class _MainBottomNavParentState extends State<MainBottomNavParent>
     with TickerProviderStateMixin {
   int _selectedIndex = 1;
 
@@ -23,7 +23,7 @@ class _MainBottomNavState extends State<MainBottomNav>
     TipsScreen(),
     DoctorsScreen(),
     ChatsScreen(),
-    GamesScreen(),
+    KidsGamesScreen(),
     SettingsScreen(),
   ];
 

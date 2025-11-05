@@ -1,9 +1,11 @@
 import 'package:autism/logic/services/doctors_screen/save_filter_doctors.dart';
+import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/parents/doctor_details_screen.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/card_gridView_widget.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/filter_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:autism/logic/services/colors_app.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DoctorsScreen extends StatefulWidget {
   const DoctorsScreen({super.key});
@@ -20,11 +22,13 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   List<dynamic> filteredDoctors = [];
   String? selectedSpecialtyLabel;
   bool isLoading = true;
+  List<Map<String, dynamic>> allTips = [];
 
   @override
   void initState() {
     super.initState();
     _loadDoctors();
+    loadUserData();
   }
 
   Future<void> _loadDoctors() async {
@@ -59,6 +63,74 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       selectedSpecialtyLabel = null;
       filteredDoctors = _doctorService.searchDoctors(doctors, value);
     });
+  }
+
+  Future<void> loadDoctorName() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+      setState(() {
+        doctorName = response['full_name'] ?? "Doctor";
+        doctorImage = response['avatar_url'] ?? 'assets/images/doctors4.jpg';
+      });
+    } catch (e) {
+      print("❌ Error loading doctor name: $e");
+      setState(() {
+        doctorName = "Doctor";
+      });
+    }
+  }
+
+  //////////////////////////////////
+  Future<void> loadDoctorTips() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('tips')
+          .select('''
+          tip_content,
+          image_url,
+          created_at,
+          profiles:doctor_id(full_name, avatar_url)
+        ''')
+          .order('created_at', ascending: false);
+
+      setState(() {
+        allTips = List<Map<String, dynamic>>.from(response);
+      });
+    } catch (e) {
+      print("❌ Error loading doctor tips: $e");
+    }
+  }
+
+  Future<void> loadUserData() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      // Fetch role
+      final profile = await Supabase.instance.client
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+      final role = profile['role'];
+
+      if (role == 'doctor') {
+        await loadDoctorName();
+      } else if (role == 'parent') {
+        await loadDoctorTips();
+      }
+    } catch (e) {
+      print("❌ Error loading user role: $e");
+    }
   }
 
   @override

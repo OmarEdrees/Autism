@@ -1,17 +1,13 @@
 import 'dart:io';
-
 import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
 import 'package:autism/logic/services/colors_app.dart';
-import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/doctors/complete_doctor_profile_screen.dart';
-import 'package:autism/presentation/screens/home_screen.dart';
-import 'package:autism/presentation/widgets/bottom_navigation_bar.dart';
 import 'package:autism/presentation/widgets/on_boarding/on_boarding_models.dart';
+import 'package:autism/presentation/widgets/parent/bottom_navigation_bar_parent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 //////////////////////////////////////////////////////////////
 ///////            List of onboarding steps            ///////
@@ -65,6 +61,7 @@ final TextEditingController doctorsDetailsScreenScheduledAt =
     TextEditingController();
 final TextEditingController doctorsDetailsScreenDurationMinutes =
     TextEditingController();
+final TextEditingController addTips = TextEditingController();
 
 //////////////////////////////////////////////////////////////
 //////////////         FocusNode            //////////////////
@@ -91,6 +88,7 @@ final FocusNode doctorsDetailsScreenTitleFocus = FocusNode();
 final FocusNode doctorsDetailsScreenDescriptionFocus = FocusNode();
 final FocusNode doctorsDetailsScreenScheduledAtFocus = FocusNode();
 final FocusNode doctorsDetailsScreenDurationMinutesFocus = FocusNode();
+final FocusNode addTipsFocus = FocusNode();
 
 //////////////////////////////////////////////////////////////
 //////////////         validator            //////////////////
@@ -221,7 +219,7 @@ void onSignUpSuccess(BuildContext context) {
   } else {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const MainBottomNav()),
+      MaterialPageRoute(builder: (context) => const MainBottomNavParent()),
     );
   }
 }
@@ -353,5 +351,33 @@ String formatLocalDate(String dateTimeString) {
     return DateFormat('yyyy-MM-dd').format(dt);
   } catch (e) {
     return dateTimeString; // fallback إذا صار خطأ
+  }
+}
+
+//////////////////////////////////////////////////////////////
+////////////           viewDoctorData            /////////////
+//////////////////////////////////////////////////////////////
+String doctorName = "";
+String doctorImage = "";
+
+//////////////////////////////////////////////////////////////
+///////////     تحديد الوقت viewDoctorData      /////////////
+//////////////////////////////////////////////////////////////
+String formatTime(String? dateTimeString) {
+  if (dateTimeString == null) return '';
+
+  final dateTime = DateTime.parse(dateTimeString).toUtc();
+  final now = DateTime.now().toUtc(); // ✅ مقارنة بنفس التوقيت
+  final difference = now.difference(dateTime);
+
+  if (difference.inMinutes <= 0) {
+    return 'Just now';
+  } else if (difference.inMinutes < 60) {
+    return '${difference.inMinutes}m ago';
+  } else if (difference.inHours < 24) {
+    final hours = (difference.inMinutes / 60).floor(); // ✅ أدق
+    return '${hours}h ago';
+  } else {
+    return '${difference.inDays}d ago';
   }
 }

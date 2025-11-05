@@ -9,6 +9,7 @@ class CustomTextFormField extends StatefulWidget {
   final String? Function(String?)? validator;
   final FocusNode focusNode;
   final int maxLines;
+  final int minLines;
   final void Function() onTap;
   final bool readOnly;
   final TextInputType keyboardType;
@@ -23,6 +24,7 @@ class CustomTextFormField extends StatefulWidget {
     required this.validator,
     required this.focusNode,
     this.maxLines = 1,
+    this.minLines = 1,
     this.onTap = _defaultOnTap,
     this.readOnly = false,
     this.keyboardType = TextInputType.emailAddress,
@@ -41,6 +43,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      minLines: widget.minLines,
       inputFormatters: widget.inputFormatters,
       keyboardType: widget.keyboardType,
       readOnly: widget.readOnly,

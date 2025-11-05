@@ -1,14 +1,12 @@
 import 'package:autism/logic/cubit/add_child/cubit/children_cubit.dart';
 import 'package:autism/logic/services/sized_config.dart';
-import 'package:autism/presentation/screens/parents/add_child_screen.dart';
-import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_SocialButton.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
 import 'package:autism/logic/services/supabase_services.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/auth/sign_up_screen.dart';
-import 'package:autism/presentation/widgets/bottom_navigation_bar.dart';
-import 'package:autism/presentation/screens/doctors/sessions_screen.dart';
+import 'package:autism/presentation/widgets/doctors/bottom_navigation_bar_doctor.dart';
+import 'package:autism/presentation/widgets/parent/bottom_navigation_bar_parent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,8 +107,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => userRole == 'doctor'
-                                  ? SessionsScreen()
-                                  : MainBottomNav(),
+                                  ? MainBottomNavDoctor()
+                                  : MainBottomNavParent(),
                             ),
                           );
                         }

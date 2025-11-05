@@ -6,14 +6,14 @@ import 'package:autism/presentation/widgets/doctors/sessions_screen/orders_tabs.
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SessionsScreen extends StatefulWidget {
-  const SessionsScreen({super.key});
+class RequestsScreen extends StatefulWidget {
+  const RequestsScreen({super.key});
 
   @override
-  State<SessionsScreen> createState() => _SessionsScreenState();
+  State<RequestsScreen> createState() => _RequestsScreenState();
 }
 
-class _SessionsScreenState extends State<SessionsScreen> {
+class _RequestsScreenState extends State<RequestsScreen> {
   late Future<List<dynamic>> futureSessions;
   String currentStatus = "pending";
 
@@ -42,8 +42,6 @@ class _SessionsScreenState extends State<SessionsScreen> {
     setState(() {});
   }
 
-  String doctorName = "";
-
   Future<void> loadDoctorName() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
@@ -51,12 +49,13 @@ class _SessionsScreenState extends State<SessionsScreen> {
     try {
       final response = await Supabase.instance.client
           .from('profiles')
-          .select('full_name')
+          .select('full_name, avatar_url')
           .eq('id', user.id)
           .single();
 
       setState(() {
         doctorName = response['full_name'] ?? "Doctor";
+        doctorImage = response['avatar_url'] ?? 'assets/images/doctors4.jpg';
       });
     } catch (e) {
       print("❌ Error loading doctor name: $e");
@@ -79,7 +78,11 @@ class _SessionsScreenState extends State<SessionsScreen> {
                 children: [
                   CircleAvatar(
                     radius: 32,
-                    backgroundImage: AssetImage("assets/images/doctors4.jpg"),
+                    backgroundImage: NetworkImage(
+                      doctorImage.isNotEmpty
+                          ? doctorImage
+                          : 'assets/images/doctors4.jpg',
+                    ),
                   ),
                   SizedBox(width: 15),
                   Column(
