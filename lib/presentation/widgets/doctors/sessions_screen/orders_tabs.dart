@@ -13,19 +13,16 @@ class _OrdersTabsState extends State<OrdersTabs> {
   int selectedIndex = 0;
 
   // القيم اللي موجودة في الـ ENUM بالـ DB (مثل ما شفنا)
-  final tabs = [
-    "pending",
-    "accepted", // 'in progress' عندك بقاها accepted
-    "completed",
-    "canceled", // انتبه: single 'l'
-  ];
+  final tabs = ["pending", "accepted", "rejected", "completed", "canceled"];
 
   String displayStatus(String status) {
     switch (status) {
       case "pending":
         return "Pending";
       case "accepted":
-        return "In Progress";
+        return "Accepted";
+      case "rejected":
+        return "Rejected";
       case "completed":
         return "Completed";
       case "canceled":
@@ -60,7 +57,7 @@ class _OrdersTabsState extends State<OrdersTabs> {
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.symmetric(horizontal: 6),
+              // margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 5),
               decoration: BoxDecoration(
                 color: isSelected

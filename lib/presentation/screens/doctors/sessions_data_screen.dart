@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SessionsDataScreen extends StatefulWidget {
   final Map<String, dynamic> sessionData;
+
   const SessionsDataScreen({super.key, required this.sessionData});
 
   @override
@@ -15,12 +16,6 @@ class SessionsDataScreen extends StatefulWidget {
 class _SessionsDataScreenState extends State<SessionsDataScreen> {
   Map<String, dynamic>? childData;
   List<dynamic> sessions = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchChildAndSessions();
-  }
 
   Future<void> fetchChildAndSessions() async {
     final childId = widget.sessionData['child_id'];
@@ -43,6 +38,59 @@ class _SessionsDataScreenState extends State<SessionsDataScreen> {
     } catch (e) {
       print('❌ Error: $e');
     }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  String? selectedStatus;
+
+  final List<String> statusOptions = [
+    "pending",
+    "accepted",
+    "rejected",
+    "completed",
+    "canceled",
+  ];
+  //////////////////////////////////////////////////////////////
+  /////              دالة تحديث حالة الطلب              ///////
+  //////////////////////////////////////////////////////////////
+  Future<void> updateSessionStatus(String sessionId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('sessions')
+          .update({'status': selectedStatus})
+          .eq('id', sessionId);
+
+      print("✅ Status updated successfully!");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Status updated to $selectedStatus ✅")),
+      );
+    } catch (e) {
+      print("❌ Error updating status: $e");
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to update status ❌")));
+    }
+  }
+
+  //////////////////////////////////////////////////////////////
+  /////              جلب الid تبع الsession             ///////
+  //////////////////////////////////////////////////////////////
+  Future<List<Map<String, dynamic>>> fetchSessions() async {
+    final response = await Supabase.instance.client
+        .from('sessions')
+        .select('id');
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  late String sessionId;
+  @override
+  void initState() {
+    super.initState();
+    fetchChildAndSessions();
+    sessionId = widget.sessionData['id'].toString();
+    print("✅ Session IDddddddddddddddddddddddddddd: $sessionId");
   }
 
   @override
@@ -215,6 +263,107 @@ class _SessionsDataScreenState extends State<SessionsDataScreen> {
                     ),
                   ),
                 ),
+                SizedBox(height: 12),
+                ?userRole == 'doctor'
+                    ? Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(left: 15, right: 15),
+                            child: DropdownButtonFormField<String>(
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                labelText: 'Session Status',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFFF7F3E),
+                                  ),
+                                ),
+                                labelStyle: TextStyle(color: Colors.grey[600]),
+                                prefixIcon: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.flag,
+                                        color: ColorsApp().primaryColor,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        height: 24,
+                                        width: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              value: selectedStatus,
+                              items: statusOptions
+                                  .map(
+                                    (status) => DropdownMenuItem(
+                                      value: status,
+                                      child: Text(status),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() => selectedStatus = value);
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: 15,
+                              right: 15,
+                              bottom: 10,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (selectedStatus == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Please select a status first!",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                updateSessionStatus(sessionId); //ID الجلسة
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF7F3E),
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Confirm',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : null,
               ],
             ),
     );

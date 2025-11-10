@@ -44,4 +44,21 @@ class SessionsService {
       return [];
     }
   }
+
+  ////////////////////////////////////////////////////////////////
+  ////// جلب الحجوزات الخاصة بالparent ////////////////////////
+  Future<List<dynamic>> getParentSessions(
+    String parentId,
+    String status,
+  ) async {
+    final response = await Supabase.instance.client
+        .from('sessions')
+        .select()
+        .eq('parent_id', parentId)
+        .eq('status', status)
+        .order('scheduled_at', ascending: false);
+
+    print("✅ Parent Sessions Loaded: ${response.length}");
+    return response;
+  }
 }

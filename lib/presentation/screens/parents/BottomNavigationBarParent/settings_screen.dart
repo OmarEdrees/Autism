@@ -3,6 +3,7 @@ import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/parents/add_child_screen.dart';
 import 'package:autism/presentation/screens/auth/edite_profile.dart';
 import 'package:autism/presentation/screens/auth/sign_in_screen.dart';
+import 'package:autism/presentation/screens/parents/sessions_screen_parent.dart';
 import 'package:autism/presentation/widgets/profile/buildListTile.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -145,6 +146,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     MaterialPageRoute(builder: (context) => AddChildScreen()),
                   );
                 },
+              ),
+              divider(),
+              buildListTile(
+                icon: Icons.calendar_month,
+                title: "My sessions",
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MySessionsScreen()),
+                  );
+                },
+              ),
+              divider(),
+              buildListTile(
+                icon: Icons.chat,
+                title: "My chats",
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {},
               ),
               divider(),
               buildListTile(

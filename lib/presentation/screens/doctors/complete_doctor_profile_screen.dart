@@ -1,7 +1,6 @@
 import 'package:autism/logic/services/sized_config.dart';
 import 'package:autism/logic/services/variables_app.dart';
 import 'package:autism/presentation/screens/parents/add_child_screen.dart';
-import 'package:autism/presentation/screens/home_screen.dart';
 import 'package:autism/presentation/widgets/auth/sign_up_in_customTextFields.dart';
 import 'package:autism/presentation/screens/doctors/BottomNavigationBarDoctor/requests_screen.dart';
 import 'package:autism/presentation/widgets/parent/doctors_screen/drop_down_specialty.dart';
